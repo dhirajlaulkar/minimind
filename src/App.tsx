@@ -1,13 +1,13 @@
-import MindMapCanvas from './components/MindMapCanvas'
-import Toolbar from './components/Toolbar'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import Landing from './pages/Landing'
+import Editor from './pages/Editor'
 
 export default function App() {
   return (
-    <div className="h-full w-full flex flex-col">
-      <Toolbar />
-      <div className="flex-1">
-        <MindMapCanvas />
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/editor" element={<Editor />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
