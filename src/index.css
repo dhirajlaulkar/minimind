@@ -13,3 +13,14 @@ html, body, #root {
   background-size: 24px 24px;
 }
 
+/* React Flow default node styles override so custom nodes align precisely */
+.react-flow__node-default {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  }
+.react-flow__node {
+  overflow: visible;
+  }
+

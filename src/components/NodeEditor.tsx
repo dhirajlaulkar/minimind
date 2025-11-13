@@ -22,11 +22,14 @@ export default function NodeEditor({ id, data, selected }: NodeProps) {
     }
   }, [selected])
 
+  const widthCh = Math.max(value.length, 6)
+
   return (
-    <div className="rounded-lg bg-white shadow-soft border border-neutral-200 px-3 py-2 min-w-40">
+    <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-2xl bg-neutral-900/90 border border-neutral-700 shadow-soft px-4 py-2">
       <input
         ref={inputRef}
-        className="w-full bg-transparent outline-none text-sm"
+        className="bg-transparent outline-none text-base text-neutral-100 placeholder:text-neutral-500"
+        style={{ width: `${widthCh}ch` }}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={commit}
@@ -34,11 +37,45 @@ export default function NodeEditor({ id, data, selected }: NodeProps) {
           if (e.key === 'Enter') {
             (e.target as HTMLInputElement).blur()
           }
+          if (e.key === 'Escape') {
+            setValue(data?.label ?? '')
+            ;(e.target as HTMLInputElement).blur()
+          }
         }}
         aria-label="Node label"
       />
-      <Handle type="target" position={Position.Top} className="w-2 h-2 bg-neutral-400" />
-      <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-neutral-400" />
+      <Handle id="t-target" type="target" position={Position.Top} className="w-2 h-2 bg-sky-500" />
+      <Handle id="b-source" type="source" position={Position.Bottom} className="w-2 h-2 bg-sky-500" />
+      {/* Left side: allow both start (source) and end (target) connections, offset so both are usable */}
+      <Handle
+        id="l-target"
+        type="target"
+        position={Position.Left}
+        className="w-2 h-2 bg-sky-500"
+        style={{ left: -8, top: '40%' }}
+      />
+      <Handle
+        id="l-source"
+        type="source"
+        position={Position.Left}
+        className="w-2 h-2 bg-sky-500"
+        style={{ left: -8, top: '60%' }}
+      />
+      {/* Right side: allow both start (source) and end (target) connections */}
+      <Handle
+        id="r-source"
+        type="source"
+        position={Position.Right}
+        className="w-2 h-2 bg-sky-500"
+        style={{ right: -8, top: '40%' }}
+      />
+      <Handle
+        id="r-target"
+        type="target"
+        position={Position.Right}
+        className="w-2 h-2 bg-sky-500"
+        style={{ right: -8, top: '60%' }}
+      />
     </div>
   )
 }
