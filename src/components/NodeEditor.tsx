@@ -25,10 +25,10 @@ export default function NodeEditor({ id, data, selected }: NodeProps) {
   const widthCh = Math.max(value.length, 6)
 
   return (
-    <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-2xl bg-neutral-900/90 border border-neutral-700 shadow-soft px-4 py-2">
+    <div className="inline-flex items-center gap-3 whitespace-nowrap border-4 border-black bg-white px-5 py-3 shadow-[6px_6px_0_#000] uppercase font-black tracking-tightest text-sm">
       <input
         ref={inputRef}
-        className="bg-transparent outline-none text-base text-neutral-100 placeholder:text-neutral-500"
+        className="bg-white text-black uppercase font-black tracking-tightest outline-none border-3 border-black px-3 py-2 shadow-[3px_3px_0_#000] focus:border-[4px] focus:shadow-[4px_4px_0_#22D3EE]"
         style={{ width: `${widthCh}ch` }}
         value={value}
         onChange={(e) => setValue(e.target.value)}
@@ -44,40 +44,34 @@ export default function NodeEditor({ id, data, selected }: NodeProps) {
         }}
         aria-label="Node label"
       />
-      <Handle id="t-target" type="target" position={Position.Top} className="w-2 h-2 bg-sky-500" />
-      <Handle id="b-source" type="source" position={Position.Bottom} className="w-2 h-2 bg-sky-500" />
+      <Handle id="t-target" type="target" position={Position.Top} />
+      <Handle id="b-source" type="source" position={Position.Bottom} />
       {/* Left side: allow both start (source) and end (target) connections, offset so both are usable */}
       <Handle
         id="l-target"
         type="target"
         position={Position.Left}
-        className="w-2 h-2 bg-sky-500"
-        style={{ left: -8, top: '40%' }}
+        style={{ left: -14, top: '40%' }}
       />
       <Handle
         id="l-source"
         type="source"
         position={Position.Left}
-        className="w-2 h-2 bg-sky-500"
-        style={{ left: -8, top: '60%' }}
+        style={{ left: -14, top: '60%' }}
       />
       {/* Right side: allow both start (source) and end (target) connections */}
       <Handle
         id="r-source"
         type="source"
         position={Position.Right}
-        className="w-2 h-2 bg-sky-500"
-        style={{ right: -8, top: '40%' }}
+        style={{ right: -14, top: '40%' }}
       />
       <Handle
         id="r-target"
         type="target"
         position={Position.Right}
-        className="w-2 h-2 bg-sky-500"
-        style={{ right: -8, top: '60%' }}
+        style={{ right: -14, top: '60%' }}
       />
     </div>
   )
 }
-
-

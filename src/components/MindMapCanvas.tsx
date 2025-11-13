@@ -56,16 +56,16 @@ export default function MindMapCanvas() {
       defaultEdgeOptions: {
         type: 'rounded',
         animated: false,
-        style: { stroke: '#38bdf8', strokeWidth: 2, strokeDasharray: '6 6' },
+        style: { stroke: '#000000', strokeWidth: 4 },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: '#38bdf8',
-          width: 18,
-          height: 18,
+          color: '#000000',
+          width: 22,
+          height: 22,
         },
       },
-      connectionLineType: ConnectionLineType.SmoothStep,
-      connectionLineStyle: { stroke: '#38bdf8', strokeWidth: 2 },
+      connectionLineType: ConnectionLineType.Straight,
+      connectionLineStyle: { stroke: '#000000', strokeWidth: 4 },
       onNodesChange: (changes: any[]) => {
         const shouldRecord = (changes as any[]).some((c) => {
           if (c.type === 'select' || c.type === 'dimensions') return false
@@ -99,7 +99,7 @@ export default function MindMapCanvas() {
       selectionOnDrag: true,
       selectionMode: SelectionMode.Partial,
       snapToGrid,
-      snapGrid: [24, 24] as [number, number],
+      snapGrid: [32, 32] as [number, number],
     }),
     [nodes, edges, onConnect, setNodes, setEdges, setSelection, snapToGrid, pushHistory],
   )
@@ -127,10 +127,8 @@ export default function MindMapCanvas() {
       <ReactFlow {...rfProps}>
         <MiniMap />
         <Controls />
-        <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" className="bg-neutral-950" />
+        <Background variant={BackgroundVariant.Lines} gap={32} lineWidth={1.5} color="#000000" className="bg-white" />
       </ReactFlow>
     </div>
   )
 }
-
-

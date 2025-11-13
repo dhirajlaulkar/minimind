@@ -20,16 +20,13 @@ export default function Editor() {
   }, [nodes, edges])
 
   return (
-    <div className="relative h-screen w-full flex flex-col bg-neutral-950 text-neutral-100">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-48 right-[-200px] h-[500px] w-[500px] rounded-full bg-gradient-to-br from-sky-900/30 via-indigo-900/20 to-purple-900/10 blur-3xl opacity-60" />
-      </div>
+    <div className="min-h-screen w-full flex flex-col bg-[#FDE047] text-black">
       <Toolbar />
-      <div className="flex-1">
-        <MindMapCanvas />
+      <div className="flex-1 px-6 pb-8 pt-6 md:px-10">
+        <div className="h-full border-4 border-black bg-white shadow-[12px_12px_0_#000]">
+          <MindMapCanvas />
+        </div>
       </div>
     </div>
   )
 }
-
-

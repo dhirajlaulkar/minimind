@@ -39,59 +39,40 @@ export default function Toolbar() {
     downloadJson(map)
   }, [nodes, edges])
 
+  const buttonBase =
+    'px-4 py-3 border-4 border-black uppercase font-black tracking-tightest shadow-[4px_4px_0_#000] transition-transform duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_#000] text-xs md:text-sm'
+
   return (
-    <div className="sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-neutral-900/60 bg-neutral-900/70 border-b border-neutral-800">
-      <div className="mx-auto max-w-screen-2xl px-4 py-3 flex items-center gap-3 text-neutral-100">
-        <div className="text-lg font-semibold tracking-tight">MiniMind Editor</div>
+    <div className="sticky top-0 z-30 border-b-4 border-black bg-white shadow-[8px_8px_0_#000]">
+      <div className="mx-auto max-w-screen-2xl px-6 py-4 flex flex-wrap items-center gap-3 text-black uppercase font-black tracking-tightest">
+        <div className="text-lg md:text-2xl">MiniMind Control Deck</div>
         <div className="flex-1" />
-        <button
-          onClick={undo}
-          className="px-3 py-1.5 rounded-md border border-neutral-700 bg-neutral-800 hover:bg-neutral-700 transition"
-          title="Undo"
-        >
+        <button onClick={undo} className={`${buttonBase} bg-white`} title="Undo">
           Undo
         </button>
-        <button
-          onClick={redo}
-          className="px-3 py-1.5 rounded-md border border-neutral-700 bg-neutral-800 hover:bg-neutral-700 transition"
-          title="Redo"
-        >
+        <button onClick={redo} className={`${buttonBase} bg-white`} title="Redo">
           Redo
         </button>
         <button
           onClick={() => setSnapToGrid(!snapToGrid)}
-          className="px-3 py-1.5 rounded-md border border-neutral-700 bg-neutral-800 hover:bg-neutral-700 transition"
+          className={`${buttonBase} ${snapToGrid ? 'bg-[#22D3EE]' : 'bg-white'}`}
           title="Toggle grid snapping"
         >
-          {snapToGrid ? 'Grid Snap: On' : 'Grid Snap: Off'}
+          {snapToGrid ? 'Grid Snap On' : 'Grid Snap Off'}
         </button>
-        <button
-          onClick={handleAdd}
-          className="px-3 py-1.5 rounded-md border border-neutral-700 bg-neutral-800 hover:bg-neutral-700 transition"
-        >
+        <button onClick={handleAdd} className={`${buttonBase} bg-[#F472B6]`}>
           Add Node
         </button>
-        <button
-          onClick={handleSave}
-          className="px-3 py-1.5 rounded-md border border-neutral-700 bg-neutral-800 hover:bg-neutral-700 transition"
-        >
+        <button onClick={handleSave} className={`${buttonBase} bg-white`}>
           Save
         </button>
-        <button
-          onClick={handleLoad}
-          className="px-3 py-1.5 rounded-md border border-neutral-700 bg-neutral-800 hover:bg-neutral-700 transition"
-        >
+        <button onClick={handleLoad} className={`${buttonBase} bg-white`}>
           Load
         </button>
-        <button
-          onClick={handleExport}
-          className="px-3 py-1.5 rounded-md bg-sky-600 text-white hover:bg-sky-500 transition"
-        >
+        <button onClick={handleExport} className={`${buttonBase} bg-[#FDE047]`}>
           Export JSON
         </button>
       </div>
     </div>
   )
 }
-
-

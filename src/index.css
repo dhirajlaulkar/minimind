@@ -1,26 +1,82 @@
 @import "tailwindcss";
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
 }
 
-/* Subtle grid background utility */
-.bg-grid {
-  background-image:
-    linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px);
-  background-size: 24px 24px;
+body {
+  background-color: #fde047;
+  color: #000000;
+  letter-spacing: -0.02em;
 }
 
-/* React Flow default node styles override so custom nodes align precisely */
+* {
+  border-radius: 0 !important;
+}
+
+.bg-grid {
+  background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.neo-shadow {
+  box-shadow: 6px 6px 0 #000000;
+}
+
+.neo-shadow-sm {
+  box-shadow: 4px 4px 0 #000000;
+}
+
+.neo-shadow-lg {
+  box-shadow: 8px 8px 0 #000000;
+}
+
 .react-flow__node-default {
   background: transparent !important;
   border: none !important;
   padding: 0 !important;
   box-shadow: none !important;
-  }
+}
+
 .react-flow__node {
   overflow: visible;
-  }
+}
+
+.react-flow__handle {
+  width: 14px !important;
+  height: 14px !important;
+  border: 3px solid #000000 !important;
+  background-color: #22d3ee !important;
+  box-shadow: 3px 3px 0 #000000 !important;
+}
+
+.react-flow__controls-button {
+  border: 3px solid #000000 !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 4px 4px 0 #000000 !important;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.react-flow__controls-button:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #000000 !important;
+}
+
+.react-flow__minimap-mask {
+  fill: rgba(0, 0, 0, 0.1) !important;
+  stroke: #000000 !important;
+  stroke-width: 3px !important;
+}
+
+.react-flow__background {
+  background-color: #ffffff !important;
+}
 
