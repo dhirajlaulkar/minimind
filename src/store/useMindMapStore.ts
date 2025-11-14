@@ -2,9 +2,19 @@ import { create } from 'zustand'
 import { nanoid } from '../utils/nanoid'
 import type { Edge, Node } from 'reactflow'
 
+export interface NodeSize {
+  width: number
+  height: number
+}
+
+export interface NodeAttributes {
+  label: string
+  size?: NodeSize
+}
+
 export interface NodeData {
   id: string
-  data: { label: string }
+  data: NodeAttributes
   position: { x: number; y: number }
 }
 
@@ -44,12 +54,18 @@ interface MindMapState {
   duplicateSelected: () => void
   loadMap: (map: MindMap) => void
   reset: () => void
+  setNodeSize: (id: string, size: NodeSize) => void
 }
+
+const DEFAULT_NODE_SIZE: NodeSize = { width: 180, height: 56 }
 
 const toSnapshot = (nodes: Node[], edges: Edge[]): MindMap => ({
   nodes: nodes.map((n) => ({
     id: n.id,
-    data: { label: (n.data as { label?: string }).label ?? '' },
+    data: {
+      label: (n.data as NodeAttributes).label ?? '',
+      size: (n.data as NodeAttributes).size,
+    },
     position: { ...n.position },
   })),
   edges: edges.map((e) => ({
@@ -63,7 +79,7 @@ const fromSnapshot = (map: MindMap): { nodes: Node[]; edges: Edge[] } => ({
   nodes: map.nodes.map((n) => ({
     id: n.id,
     type: 'default',
-    data: { label: n.data.label },
+    data: { label: n.data.label, size: n.data.size ?? DEFAULT_NODE_SIZE },
     position: { ...n.position },
   })),
   edges: map.edges.map((e) => ({
@@ -78,7 +94,7 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
   nodes: [
     {
       id: 'root',
-      data: { label: 'Main Idea' },
+      data: { label: 'Main Idea', size: DEFAULT_NODE_SIZE },
       position: { x: 0, y: 0 },
       type: 'default',
     },
@@ -135,7 +151,7 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
     set((state) => {
       const newNode: Node = {
         id: nanoid(),
-        data: { label },
+        data: { label, size: DEFAULT_NODE_SIZE },
         position,
         type: 'default',
       }
@@ -145,11 +161,21 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
 
   updateNodeLabel: (id, label) => {
     const current = get().nodes.find((n) => n.id === id)
-    const existing = current ? (current.data as { label?: string }).label : undefined
+    const existing = current ? (current.data as NodeAttributes).label : undefined
     if (existing === label) return
     get().pushHistory()
     set((state) => ({
-      nodes: state.nodes.map((n) => (n.id === id ? { ...n, data: { ...n.data, label } } : n)),
+      nodes: state.nodes.map((n) =>
+        n.id === id
+          ? {
+              ...n,
+              data: {
+                ...(n.data as NodeAttributes),
+                label,
+              },
+            }
+          : n,
+      ),
     }))
   },
 
@@ -196,6 +222,7 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
         ...n,
         id: nanoid(),
         position: { x: n.position.x + 24, y: n.position.y + 24 },
+        data: { ...(n.data as NodeAttributes) },
       }))
       return { nodes: [...state.nodes, ...clones] }
     })
@@ -212,7 +239,7 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
       nodes: [
         {
           id: 'root',
-          data: { label: 'Main Idea' },
+          data: { label: 'Main Idea', size: DEFAULT_NODE_SIZE },
           position: { x: 0, y: 0 },
           type: 'default',
         },
@@ -223,6 +250,32 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
       past: [],
       future: [],
     }),
+
+  setNodeSize: (id, size) => {
+    const { nodes, pushHistory } = get()
+    const target = nodes.find((n) => n.id === id)
+    if (!target) return
+    const currentSize = (target.data as NodeAttributes).size
+    const normalized = {
+      width: Math.round(size.width),
+      height: Math.round(size.height),
+    }
+    if (currentSize && currentSize.width === normalized.width && currentSize.height === normalized.height) return
+    pushHistory()
+    set((state) => ({
+      nodes: state.nodes.map((n) =>
+        n.id === id
+          ? {
+              ...n,
+              data: {
+                ...(n.data as any),
+                size: normalized,
+              },
+            }
+          : n,
+      ),
+    }))
+  },
 }))
 
 

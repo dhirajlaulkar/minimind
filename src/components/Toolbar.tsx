@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useMindMapStore, type MindMap } from '../store/useMindMapStore'
+import { useMindMapStore, type MindMap, type NodeSize } from '../store/useMindMapStore'
 import { saveMap, loadMap } from '../utils/storage'
 import { downloadJson } from '../utils/export'
 import { nanoid } from '../utils/nanoid'
@@ -20,7 +20,17 @@ export default function Toolbar() {
 
   const handleSave = useCallback(() => {
     const map: MindMap = {
-      nodes: nodes.map((n) => ({ id: n.id, data: { label: (n.data as any).label }, position: n.position })),
+      nodes: nodes.map((n) => {
+        const data = n.data as { label?: string; size?: NodeSize }
+        return {
+          id: n.id,
+          data: {
+            label: data.label ?? '',
+            size: data.size,
+          },
+          position: n.position,
+        }
+      }),
       edges: edges.map((e) => ({ id: e.id ?? nanoid(), source: e.source, target: e.target })),
     }
     saveMap(map)
@@ -33,7 +43,17 @@ export default function Toolbar() {
 
   const handleExport = useCallback(() => {
     const map: MindMap = {
-      nodes: nodes.map((n) => ({ id: n.id, data: { label: (n.data as any).label }, position: n.position })),
+      nodes: nodes.map((n) => {
+        const data = n.data as { label?: string; size?: NodeSize }
+        return {
+          id: n.id,
+          data: {
+            label: data.label ?? '',
+            size: data.size,
+          },
+          position: n.position,
+        }
+      }),
       edges: edges.map((e) => ({ id: e.id ?? nanoid(), source: e.source, target: e.target })),
     }
     downloadJson(map)

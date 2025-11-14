@@ -1,7 +1,7 @@
 import Toolbar from '../components/Toolbar'
 import MindMapCanvas from '../components/MindMapCanvas'
 import { useEffect } from 'react'
-import { useMindMapStore } from '../store/useMindMapStore'
+import { useMindMapStore, type NodeSize } from '../store/useMindMapStore'
 import { saveMap } from '../utils/storage'
 import { debounce } from '../utils/debounce'
 import '../editor.css'
@@ -13,7 +13,17 @@ export default function Editor() {
   useEffect(() => {
     const run = debounce(() => {
       saveMap({
-        nodes: nodes.map((n) => ({ id: n.id, data: { label: (n.data as any).label }, position: n.position })),
+        nodes: nodes.map((n) => {
+          const data = n.data as { label?: string; size?: NodeSize }
+          return {
+            id: n.id,
+            data: {
+              label: data.label ?? '',
+              size: data.size,
+            },
+            position: n.position,
+          }
+        }),
         edges: edges.map((e) => ({ id: e.id!, source: e.source, target: e.target })),
       })
     }, 600)

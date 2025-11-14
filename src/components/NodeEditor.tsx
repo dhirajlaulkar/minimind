@@ -1,47 +1,116 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Handle, Position, type NodeProps } from 'reactflow'
-import { useMindMapStore } from '../store/useMindMapStore'
+import { useMindMapStore, type NodeSize } from '../store/useMindMapStore'
+
+const MIN_WIDTH = 140
+const MIN_HEIGHT = 56
+
+const ensureSize = (size?: NodeSize | null): NodeSize => ({
+  width: Math.max(MIN_WIDTH, size?.width ?? MIN_WIDTH),
+  height: Math.max(MIN_HEIGHT, size?.height ?? MIN_HEIGHT),
+})
 
 export default function NodeEditor({ id, data, selected }: NodeProps) {
+  const nodeData = (data ?? {}) as { label?: string; size?: NodeSize }
   const updateNodeLabel = useMindMapStore((s) => s.updateNodeLabel)
-  const [value, setValue] = useState<string>(data?.label ?? '')
-  const inputRef = useRef<HTMLInputElement | null>(null)
+  const setNodeSize = useMindMapStore((s) => s.setNodeSize)
+  const [value, setValue] = useState<string>(nodeData.label ?? '')
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const latestSizeRef = useRef<NodeSize>(ensureSize(nodeData.size))
+  const pointerActiveRef = useRef(false)
 
   useEffect(() => {
-    setValue(data?.label ?? '')
-  }, [data?.label])
+    setValue(nodeData.label ?? '')
+  }, [nodeData.label])
 
-  const commit = useCallback(() => {
+  const applySize = useCallback((size: NodeSize) => {
+    const node = containerRef.current
+    if (!node) return
+    node.style.width = `${size.width}px`
+    node.style.height = `${size.height}px`
+  }, [])
+
+  useLayoutEffect(() => {
+    const nextSize = ensureSize(nodeData.size)
+    latestSizeRef.current = nextSize
+    applySize(nextSize)
+  }, [nodeData.size?.width, nodeData.size?.height, applySize])
+
+  const commitLabel = useCallback(() => {
     updateNodeLabel(id, value.trim() === '' ? 'Untitled' : value)
   }, [id, updateNodeLabel, value])
 
+  const commitSize = useCallback(() => {
+    setNodeSize(id, latestSizeRef.current)
+  }, [id, setNodeSize])
+
   useEffect(() => {
     if (selected) {
-      inputRef.current?.focus()
-      inputRef.current?.select()
+      textareaRef.current?.focus()
+      textareaRef.current?.select()
     }
   }, [selected])
 
-  const widthCh = Math.max(value.length, 6)
+  useEffect(() => {
+    const node = containerRef.current
+    if (!node) return
+
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      latestSizeRef.current = ensureSize({ width, height })
+    })
+    observer.observe(node)
+
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const node = containerRef.current
+    if (!node) return
+
+    const handlePointerDown = () => {
+      pointerActiveRef.current = true
+    }
+
+    const handlePointerUp = () => {
+      if (!pointerActiveRef.current) return
+      pointerActiveRef.current = false
+      commitSize()
+    }
+
+    node.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener('pointerup', handlePointerUp)
+
+    return () => {
+      node.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('pointerup', handlePointerUp)
+    }
+  }, [commitSize])
 
   return (
-    <div className="mindmap-node">
-      <input
-        ref={inputRef}
-        style={{ width: `${widthCh}ch` }}
+    <div ref={containerRef} className="mindmap-node">
+      <textarea
+        ref={textareaRef}
+        rows={1}
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        onBlur={commit}
+        onBlur={() => {
+          commitLabel()
+          commitSize()
+        }}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            (e.target as HTMLInputElement).blur()
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault()
+            ;(e.target as HTMLTextAreaElement).blur()
           }
           if (e.key === 'Escape') {
-            setValue(data?.label ?? '')
-            ;(e.target as HTMLInputElement).blur()
+            setValue(nodeData.label ?? '')
+            ;(e.target as HTMLTextAreaElement).blur()
           }
         }}
         aria-label="Node label"
+        spellCheck={false}
       />
       <Handle id="t-target" type="target" position={Position.Top} />
       <Handle id="b-source" type="source" position={Position.Bottom} />
