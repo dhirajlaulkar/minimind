@@ -9,6 +9,9 @@ import ReactFlow, {
   type Edge,
   type Node,
   type OnConnect,
+  type NodeChange,
+  type EdgeChange,
+  type OnSelectionChangeParams,
   MarkerType,
   ConnectionMode,
   ConnectionLineType,
@@ -37,11 +40,9 @@ export default function MindMapCanvas() {
   const onConnect: OnConnect = useCallback(
     (connection: Connection) => {
       pushHistory()
-      const newEdge = rfAddEdge(connection as any, [])
-      if (Array.isArray(newEdge)) {
-        // rfAddEdge returns updated edges when provided existing edges; with []
-        // it returns a new edge array of size 1
-        addEdgeStore(newEdge[0] as Edge)
+      const newEdges = rfAddEdge(connection, [])
+      if (newEdges.length > 0) {
+        addEdgeStore(newEdges[0] as Edge)
       }
     },
     [addEdgeStore, pushHistory],
@@ -66,8 +67,8 @@ export default function MindMapCanvas() {
       },
       connectionLineType: ConnectionLineType.Straight,
       connectionLineStyle: { stroke: '#2563eb', strokeWidth: 2 },
-      onNodesChange: (changes: any[]) => {
-        const shouldRecord = (changes as any[]).some((c) => {
+      onNodesChange: (changes: NodeChange[]) => {
+        const shouldRecord = changes.some((c) => {
           if (c.type === 'select' || c.type === 'dimensions') return false
           if (c.type === 'position') return c.dragging === false
           return true
@@ -77,19 +78,19 @@ export default function MindMapCanvas() {
         }
         setNodes(applyNodeChanges(changes, nodes as Node[]))
       },
-      onEdgesChange: (changes: any[]) => {
-        const shouldRecord = (changes as any[]).some((c) => c.type !== 'select')
+      onEdgesChange: (changes: EdgeChange[]) => {
+        const shouldRecord = changes.some((c) => c.type !== 'select')
         if (shouldRecord) {
           pushHistory()
         }
         setEdges(applyEdgeChanges(changes, edges as Edge[]))
       },
-      onSelectionChange: (sel: { nodes: Node[]; edges: Edge[] }) => {
+      onSelectionChange: (sel: OnSelectionChangeParams) => {
         setSelection(sel.nodes.map((n) => n.id), sel.edges.map((e) => e.id))
       },
       onConnect,
       connectionMode: ConnectionMode.Loose,
-      isValidConnection: (conn: any) => conn.source !== conn.target,
+      isValidConnection: (conn: Connection) => conn.source !== conn.target,
       fitView: true,
       fitViewOptions: { padding: 0.2 },
       panOnDrag: true,
@@ -127,7 +128,7 @@ export default function MindMapCanvas() {
       <ReactFlow {...rfProps}>
         <MiniMap />
         <Controls />
-        <Background variant={BackgroundVariant.Lines} gap={32} lineWidth={1.5} color="#000000" className="bg-white" />
+        <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#d1d5db" />
       </ReactFlow>
     </div>
   )
