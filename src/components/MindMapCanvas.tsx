@@ -56,16 +56,16 @@ export default function MindMapCanvas() {
       defaultEdgeOptions: {
         type: 'rounded',
         animated: false,
-        style: { stroke: '#000000', strokeWidth: 4 },
+        style: { stroke: '#2563eb', strokeWidth: 2 },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: '#000000',
-          width: 22,
-          height: 22,
+          color: '#2563eb',
+          width: 14,
+          height: 14,
         },
       },
       connectionLineType: ConnectionLineType.Straight,
-      connectionLineStyle: { stroke: '#000000', strokeWidth: 4 },
+      connectionLineStyle: { stroke: '#2563eb', strokeWidth: 2 },
       onNodesChange: (changes: any[]) => {
         const shouldRecord = (changes as any[]).some((c) => {
           if (c.type === 'select' || c.type === 'dimensions') return false

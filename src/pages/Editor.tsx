@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useMindMapStore } from '../store/useMindMapStore'
 import { saveMap } from '../utils/storage'
 import { debounce } from '../utils/debounce'
+import '../editor.css'
 
 export default function Editor() {
   const nodes = useMindMapStore((s) => s.nodes)
@@ -20,10 +21,10 @@ export default function Editor() {
   }, [nodes, edges])
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-[#FDE047] text-black">
+    <div className="simple-editor h-screen w-full flex flex-col">
       <Toolbar />
-      <div className="flex-1 px-6 pb-8 pt-6 md:px-10">
-        <div className="h-full border-4 border-black bg-white shadow-[12px_12px_0_#000]">
+      <div className="flex-1 p-4 flex">
+        <div className="editor-surface flex-1">
           <MindMapCanvas />
         </div>
       </div>

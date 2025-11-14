@@ -1,4 +1,4 @@
-export function debounce<T extends (...args: any[]) => void>(fn: T, wait = 400) {
+export function debounce<T extends (...args: unknown[]) => void>(fn: T, wait = 400) {
   let t: number | undefined
   return (...args: Parameters<T>) => {
     window.clearTimeout(t)

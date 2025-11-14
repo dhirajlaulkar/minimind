@@ -1,4 +1,5 @@
 import { BaseEdge, type EdgeProps } from 'reactflow'
+import type { CSSProperties } from 'react'
 
 export default function RoundedEdge({
   sourceX,
@@ -11,7 +12,7 @@ export default function RoundedEdge({
 }: EdgeProps) {
   const midX = sourceX + (targetX - sourceX) / 2
   const path = `M ${sourceX},${sourceY} L ${midX},${sourceY} L ${midX},${targetY} L ${targetX},${targetY}`
-  const edgeStyle = {
+  const edgeStyle: CSSProperties = {
     ...(style ?? {}),
     strokeLinecap: 'square',
     strokeLinejoin: 'miter',

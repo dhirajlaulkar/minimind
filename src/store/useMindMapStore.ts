@@ -49,7 +49,7 @@ interface MindMapState {
 const toSnapshot = (nodes: Node[], edges: Edge[]): MindMap => ({
   nodes: nodes.map((n) => ({
     id: n.id,
-    data: { label: (n.data as any).label ?? '' },
+    data: { label: (n.data as { label?: string }).label ?? '' },
     position: { ...n.position },
   })),
   edges: edges.map((e) => ({
@@ -145,7 +145,7 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
 
   updateNodeLabel: (id, label) => {
     const current = get().nodes.find((n) => n.id === id)
-    const existing = current ? (current.data as any).label : undefined
+    const existing = current ? (current.data as { label?: string }).label : undefined
     if (existing === label) return
     get().pushHistory()
     set((state) => ({
