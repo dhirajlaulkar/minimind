@@ -5,78 +5,54 @@ body,
 #root {
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 body {
-  background-color: #fde047;
-  color: #000000;
-  letter-spacing: -0.02em;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-family: 'Inter', sans-serif;
 }
 
-* {
-  border-radius: 0 !important;
-}
-
-.bg-grid {
-  background-image:
-      linear-gradient(to right, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-  background-size: 32px 32px;
-}
-
-.neo-shadow {
-  box-shadow: 6px 6px 0 #000000;
-}
-
-.neo-shadow-sm {
-  box-shadow: 4px 4px 0 #000000;
-}
-
-.neo-shadow-lg {
-  box-shadow: 8px 8px 0 #000000;
-}
-
+/* React Flow Overrides for Modern Look */
+/* React Flow Overrides */
 .react-flow__node-default {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-}
-
-.react-flow__node {
-  overflow: visible;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
 
 .react-flow__handle {
-  width: 14px !important;
-  height: 14px !important;
-  border: 3px solid #000000 !important;
-  background-color: #22d3ee !important;
-  box-shadow: 3px 3px 0 #000000 !important;
+  width: 8px;
+  height: 8px;
+  background: #94a3b8;
+  border: 2px solid white;
+  transition: all 0.2s;
 }
 
-.react-flow__controls-button {
-  border: 3px solid #000000 !important;
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  box-shadow: 4px 4px 0 #000000 !important;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
+.react-flow__handle:hover {
+  background: #3b82f6;
+  width: 10px;
+  height: 10px;
 }
 
-.react-flow__controls-button:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 #000000 !important;
+.react-flow__edge-path {
+  stroke: #94a3b8;
+  stroke-width: 2;
+}
+
+.react-flow__attribution {
+  display: none;
+}
+
+.react-flow__minimap {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .react-flow__minimap-mask {
-  fill: rgba(0, 0, 0, 0.1) !important;
-  stroke: #000000 !important;
-  stroke-width: 3px !important;
+  fill: rgba(241, 245, 249, 0.6);
 }
-
-.react-flow__background {
-  background-color: #ffffff !important;
-}
-

@@ -2,9 +2,8 @@ import { useCallback, useEffect, useMemo } from 'react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
-  Controls,
+
   MiniMap,
-  addEdge as rfAddEdge,
   type Connection,
   type Edge,
   type Node,
@@ -38,12 +37,10 @@ export default function MindMapCanvas() {
   const snapToGrid = useMindMapStore((s) => s.snapToGrid)
 
   const onConnect: OnConnect = useCallback(
-    (connection: Connection) => {
+    (params: Connection) => {
+      // Push history before adding edge
       pushHistory()
-      const newEdges = rfAddEdge(connection, [])
-      if (newEdges.length > 0) {
-        addEdgeStore(newEdges[0] as Edge)
-      }
+      addEdgeStore({ ...params, type: 'rounded', markerEnd: { type: MarkerType.ArrowClosed } } as Edge)
     },
     [addEdgeStore, pushHistory],
   )
@@ -67,28 +64,24 @@ export default function MindMapCanvas() {
       },
       connectionLineType: ConnectionLineType.Straight,
       connectionLineStyle: { stroke: '#2563eb', strokeWidth: 2 },
+      onConnect,
       onNodesChange: (changes: NodeChange[]) => {
-        const shouldRecord = changes.some((c) => {
-          if (c.type === 'select' || c.type === 'dimensions') return false
-          if (c.type === 'position') return c.dragging === false
-          return true
-        })
-        if (shouldRecord) {
-          pushHistory()
-        }
+        // We need to be careful not to push history on every drag frame
+        // React Flow handles the drag state, we just sync it
+        // For now, we rely on the store's setNodes to update state
+        // A better approach for history on drag end would be to use onNodeDragStop
         setNodes(applyNodeChanges(changes, nodes as Node[]))
       },
       onEdgesChange: (changes: EdgeChange[]) => {
-        const shouldRecord = changes.some((c) => c.type !== 'select')
-        if (shouldRecord) {
-          pushHistory()
-        }
         setEdges(applyEdgeChanges(changes, edges as Edge[]))
+      },
+      onNodeDragStart: () => {
+        // Capture state before drag starts
+        useMindMapStore.getState().pushHistory()
       },
       onSelectionChange: (sel: OnSelectionChangeParams) => {
         setSelection(sel.nodes.map((n) => n.id), sel.edges.map((e) => e.id))
       },
-      onConnect,
       connectionMode: ConnectionMode.Loose,
       isValidConnection: (conn: Connection) => conn.source !== conn.target,
       fitView: true,
@@ -125,10 +118,9 @@ export default function MindMapCanvas() {
 
   return (
     <div className="w-full h-full">
-      <ReactFlow {...rfProps}>
-        <MiniMap />
-        <Controls />
-        <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#d1d5db" />
+      <ReactFlow {...rfProps} minZoom={0.1} maxZoom={4}>
+        <MiniMap className="!bg-white !border-slate-200 !rounded-lg !shadow-lg" />
+        <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#cbd5e1" />
       </ReactFlow>
     </div>
   )

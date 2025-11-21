@@ -1,9 +1,11 @@
-import Toolbar from '../components/Toolbar'
 import MindMapCanvas from '../components/MindMapCanvas'
+import FloatingToolbar from '../components/FloatingToolbar'
+import PropertiesPanel from '../components/PropertiesPanel'
 import { useEffect } from 'react'
-import { useMindMapStore, type NodeSize } from '../store/useMindMapStore'
+import { useMindMapStore } from '../store/useMindMapStore'
 import { saveMap } from '../utils/storage'
 import { debounce } from '../utils/debounce'
+import { ReactFlowProvider } from 'reactflow'
 import '../editor.css'
 
 export default function Editor() {
@@ -14,12 +16,15 @@ export default function Editor() {
     const run = debounce(() => {
       saveMap({
         nodes: nodes.map((n) => {
-          const data = n.data as { label?: string; size?: NodeSize }
+          const data = n.data as any
           return {
             id: n.id,
             data: {
               label: data.label ?? '',
               size: data.size,
+              color: data.color,
+              shape: data.shape,
+              locked: data.locked,
             },
             position: n.position,
           }
@@ -31,13 +36,12 @@ export default function Editor() {
   }, [nodes, edges])
 
   return (
-    <div className="simple-editor h-screen w-full flex flex-col">
-      <Toolbar />
-      <div className="flex-1 p-4 flex">
-        <div className="editor-surface flex-1">
-          <MindMapCanvas />
-        </div>
+    <ReactFlowProvider>
+      <div className="relative h-screen w-full overflow-hidden bg-slate-50">
+        <MindMapCanvas />
+        <FloatingToolbar />
+        <PropertiesPanel />
       </div>
-    </div>
+    </ReactFlowProvider>
   )
 }

@@ -10,6 +10,9 @@ export interface NodeSize {
 export interface NodeAttributes {
   label: string
   size?: NodeSize
+  color?: string
+  shape?: 'rectangle' | 'circle' | 'diamond' | 'hexagon'
+  locked?: boolean
 }
 
 export interface NodeData {
@@ -22,6 +25,10 @@ export interface EdgeData {
   id: string
   source: string
   target: string
+  label?: string
+  type?: string
+  animated?: boolean
+  style?: any
 }
 
 export interface MindMap {
@@ -46,6 +53,9 @@ interface MindMapState {
   setSnapToGrid: (value: boolean) => void
   addNode: (label?: string, position?: { x: number; y: number }) => void
   updateNodeLabel: (id: string, label: string) => void
+  updateNodeStyle: (id: string, style: Partial<NodeAttributes>) => void
+  updateEdge: (id: string, data: Partial<Edge>) => void
+  toggleLock: (id: string) => void
   setNodes: (nodes: Node[]) => void
   setEdges: (edges: Edge[]) => void
   addEdge: (edge: Edge) => void
@@ -65,13 +75,20 @@ const toSnapshot = (nodes: Node[], edges: Edge[]): MindMap => ({
     data: {
       label: (n.data as NodeAttributes).label ?? '',
       size: (n.data as NodeAttributes).size,
+      color: (n.data as NodeAttributes).color,
+      shape: (n.data as NodeAttributes).shape,
+      locked: (n.data as NodeAttributes).locked,
     },
     position: { ...n.position },
   })),
   edges: edges.map((e) => ({
-    id: e.id ?? nanoid(),
+    id: e.id,
     source: e.source,
     target: e.target,
+    label: e.label as string,
+    type: e.type,
+    animated: e.animated,
+    style: e.style,
   })),
 })
 
@@ -79,14 +96,25 @@ const fromSnapshot = (map: MindMap): { nodes: Node[]; edges: Edge[] } => ({
   nodes: map.nodes.map((n) => ({
     id: n.id,
     type: 'default',
-    data: { label: n.data.label, size: n.data.size ?? DEFAULT_NODE_SIZE },
+    data: {
+      label: n.data.label,
+      size: n.data.size ?? DEFAULT_NODE_SIZE,
+      color: n.data.color,
+      shape: n.data.shape,
+      locked: n.data.locked,
+    },
     position: { ...n.position },
+    draggable: !n.data.locked,
   })),
   edges: map.edges.map((e) => ({
     id: e.id,
     source: e.source,
     target: e.target,
-    type: 'rounded',
+    type: e.type ?? 'rounded',
+    label: e.label,
+    animated: e.animated,
+    style: e.style,
+    markerEnd: { type: 'arrowclosed' as any },
   })),
 })
 
@@ -168,12 +196,12 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
       nodes: state.nodes.map((n) =>
         n.id === id
           ? {
-              ...n,
-              data: {
-                ...(n.data as NodeAttributes),
-                label,
-              },
-            }
+            ...n,
+            data: {
+              ...(n.data as NodeAttributes),
+              label,
+            },
+          }
           : n,
       ),
     }))
@@ -187,14 +215,22 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
   },
   addEdge: (edge) =>
     set((state) => ({
-      edges: [...state.edges, { ...edge, type: edge.type ?? 'rounded' }],
+      edges: [
+        ...state.edges,
+        {
+          ...edge,
+          type: edge.type ?? 'rounded',
+          markerEnd: { type: 'arrowclosed' as any },
+        },
+      ],
     })),
 
-  setSelection: (nodeIds, edgeIds) =>
+  setSelection: (nodeIds, edgeIds) => {
     set({
       selectedNodeIds: new Set(nodeIds),
       selectedEdgeIds: new Set(edgeIds),
-    }),
+    })
+  },
 
   removeSelected: () => {
     const { selectedNodeIds, selectedEdgeIds } = get()
@@ -251,6 +287,58 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
       future: [],
     }),
 
+  updateNodeStyle: (id, style) => {
+    const current = get().nodes.find((n) => n.id === id)
+    if (!current) return
+    const currentData = current.data as NodeAttributes
+
+    // Check if any value actually changed
+    const hasChanges = Object.entries(style).some(
+      ([key, value]) => currentData[key as keyof NodeAttributes] !== value
+    )
+    if (!hasChanges) return
+
+    get().pushHistory()
+    set((state) => ({
+      nodes: state.nodes.map((n) =>
+        n.id === id
+          ? {
+            ...n,
+            data: {
+              ...currentData,
+              ...style,
+            },
+          }
+          : n,
+      ),
+    }))
+  },
+
+  updateEdge: (id, data) => {
+    get().pushHistory()
+    set((state) => ({
+      edges: state.edges.map((e) => (e.id === id ? { ...e, ...data } : e)),
+    }))
+  },
+
+  toggleLock: (id) => {
+    get().pushHistory()
+    set((state) => ({
+      nodes: state.nodes.map((n) =>
+        n.id === id
+          ? {
+            ...n,
+            draggable: !!(n.data as NodeAttributes).locked, // If currently locked (true), draggable becomes true.
+            data: {
+              ...(n.data as NodeAttributes),
+              locked: !(n.data as NodeAttributes).locked,
+            },
+          }
+          : n,
+      ),
+    }))
+  },
+
   setNodeSize: (id, size) => {
     const { nodes, pushHistory } = get()
     const target = nodes.find((n) => n.id === id)
@@ -266,16 +354,14 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
       nodes: state.nodes.map((n) =>
         n.id === id
           ? {
-              ...n,
-              data: {
-                ...(n.data as any),
-                size: normalized,
-              },
-            }
+            ...n,
+            data: {
+              ...(n.data as any),
+              size: normalized,
+            },
+          }
           : n,
       ),
     }))
   },
 }))
-
-
